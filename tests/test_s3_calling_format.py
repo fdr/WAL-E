@@ -250,7 +250,7 @@ def test_str_repr_call_info():
     assert repr(cinfo) == (
         "CallingInfo(Hello-World, "
         "<class 'boto.s3.connection.OrdinaryCallingFormat'>, "
-        "'us-standard', 's3.amazonaws.com')"
+        "'us-standard', 's3-external-1.amazonaws.com')"
     )
 
 
