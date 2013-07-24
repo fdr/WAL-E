@@ -20,6 +20,7 @@ _S3_REGIONS = {
     'eu-west-1': 's3-eu-west-1.amazonaws.com',
     'sa-east-1': 's3-sa-east-1.amazonaws.com',
     'us-standard': 's3.amazonaws.com',
+    'us-standard-virginia': 's3-external-1.amazonaws.com',
     'us-west-1': 's3-us-west-1.amazonaws.com',
     'us-west-2': 's3-us-west-2.amazonaws.com',
 }
@@ -277,7 +278,7 @@ def from_store_name(bucket_name):
             bucket_name=bucket_name,
             region='us-standard',
             calling_format=connection.OrdinaryCallingFormat,
-            ordinary_endpoint=_S3_REGIONS['us-standard'])
+            ordinary_endpoint=_S3_REGIONS['us-standard-virginia'])
     else:
         if '.' in bucket_name:
             # The bucket_name might have been DNS compatible, but once
