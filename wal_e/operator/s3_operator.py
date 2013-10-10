@@ -335,7 +335,7 @@ class S3Backup(object):
             sentinel_content.seek(0)
             s3_worker.uri_put_file(
                 self.aws_access_key_id, self.aws_secret_access_key,
-                self.session_token,
+                self.aws_session_token,
                 uploaded_to + '_backup_stop_sentinel.json',
                 sentinel_content, content_encoding='application/json')
         else:
