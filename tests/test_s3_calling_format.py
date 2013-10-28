@@ -272,7 +272,8 @@ def test_cipher_suites():
     # seems to be a more natural choice, but leaves the '.sock'
     # attribute null.
     conn.get_all_buckets()
-    htcon = conn._pool.get_http_connection('s3.amazonaws.com', True)
+    htcon = conn._pool.get_http_connection(host='s3.amazonaws.com', port=443,
+                                           is_secure=True)
 
     chosen_cipher_suite = htcon.sock.cipher()[0].split('-')
 
