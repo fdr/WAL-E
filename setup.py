@@ -32,12 +32,37 @@ install_requires = [
 
 tests_require = [
     "pytest-capturelog>=0.7",
+    "pytest-cov",
+    "pytest-flakes",
+    "pytest-pep8",
+    "pytest-xdist",
     "pytest>=2.2.1",
-    "tox>=1.4.2",
 ]
 
 if sys.version_info < (2, 7):
     install_requires.append('argparse>=0.8')
+
+from setuptools.command.test import test as TestCommand
+
+test_args = []
+if sys.argv[1] == 'test':
+    test_args = sys.argv[2:]
+    sys.argv = sys.argv[:2]
+
+class PyTest(TestCommand):
+
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = test_args
+        self.test_suite = True
+
+    def run_tests(self):
+        # import here, cause outside the eggs aren't loaded
+        import pytest
+        self.test_args = ['--pep8', '--flakes', 'tests', 'wal_e'] + self.test_args
+        print self.test_args
+        errno = pytest.main(self.test_args)
+        sys.exit(errno)
 
 setup(
     name="wal-e",
@@ -46,6 +71,7 @@ setup(
 
     install_requires=install_requires,
     tests_require=tests_require,
+    cmdclass = {'test': PyTest},
 
     # metadata for upload to PyPI
     author="Daniel Farina",
@@ -63,9 +89,6 @@ setup(
 
     # Include the VERSION file
     package_data={'wal_e': ['VERSION']},
-
-    # run tests
-    test_suite='runtests.runtests',
 
     # install
     entry_points={'console_scripts': ['wal-e=wal_e.cmd:main']})
