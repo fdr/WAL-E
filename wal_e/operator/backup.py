@@ -96,8 +96,12 @@ class Backup(object):
         # There must be exactly one qualifying backup at this point.
         assert len(backups) == 1
         assert backups[0] is not None
+        return self._database_fetch_from_backup_info(
+            backups[0], pg_cluster_dir, blind_restore, restore_spec, pool_size)
 
-        backup_info = backups[0]
+    def _database_fetch_from_backup_info(self, backup_info, pg_cluster_dir,
+                                         blind_restore, restore_spec,
+                                         pool_size):
         backup_info.load_detail(self.new_connection())
         self.layout.basebackup_tar_partition_directory(backup_info)
 
