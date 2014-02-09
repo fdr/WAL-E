@@ -22,9 +22,11 @@ from wal_e.subprocess import PIPE
 # modules, so do this to quiet pyflakes.
 assert PIPE
 
-# Determine the maximum number of bytes that can be written atomically
-# to a pipe
-PIPE_BUF_BYTES = os.pathconf('.', os.pathconf_names['PC_PIPE_BUF'])
+# The largest unit that will be submitted to one system call.  This
+# number is the default seen in modern Linux, 1MB, and seems large
+# enough for all practical purposes on any platform, even if larger
+# buffers are possible.
+PIPE_BUF_BYTES = 1048576
 
 
 class NonBlockPipeFileWrap(object):
