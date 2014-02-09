@@ -9,6 +9,12 @@
 # Licensed to PSF under a Contributor Agreement.
 # See http://www.python.org/2.4/license for licensing details.
 
+# WAL-E Change:
+#
+# Replace os.fdopen with NonBlockBufferedReader/NonBlockBufferedWriter
+# that tries to deal with EAGAIN and buffering in a optimized way.
+from wal_e import pipebuf
+
 r"""subprocess - Subprocesses with accessible I/O streams
 
 This module allows you to spawn processes, connect to their
@@ -739,12 +745,12 @@ class Popen(object):
                 errread = msvcrt.open_osfhandle(errread.Detach(), 0)
 
         if p2cwrite is not None:
-            self.stdin = os.fdopen(p2cwrite, 'wb', bufsize)
+            self.stdin = pipebuf.NonBlockBufferedWriter(p2cwrite)
         if c2pread is not None:
             if universal_newlines:
-                self.stdout = os.fdopen(c2pread, 'rU', bufsize)
+                self.stdout = pipebuf.NonBlockBufferedReader(c2pread)
             else:
-                self.stdout = os.fdopen(c2pread, 'rb', bufsize)
+                self.stdout = pipebuf.NonBlockBufferedReader(c2pread)
         if errread is not None:
             if universal_newlines:
                 self.stderr = os.fdopen(errread, 'rU', bufsize)

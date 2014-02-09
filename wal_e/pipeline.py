@@ -3,9 +3,10 @@ compression/encryption.
 """
 
 from gevent import sleep
+from wal_e import pipebuf
 
 from wal_e.exception import UserCritical
-from wal_e.piper import popen_sp, NonBlockPipeFileWrap, PIPE
+from wal_e.piper import popen_sp, PIPE
 
 PV_BIN = 'pv'
 GPG_BIN = 'gpg'
@@ -68,13 +69,17 @@ class Pipeline(object):
         last_command.stdoutSet = out_fd
         last_command.start()
 
-    @property
-    def stdin(self):
-        return NonBlockPipeFileWrap(self.commands[0].stdin)
+        stdin = commands[0].stdin
+        if stdin is not None:
+            self.stdin = pipebuf.NonBlockBufferedWriter(stdin.fileno())
+        else:
+            self.stdin = None
 
-    @property
-    def stdout(self):
-        return NonBlockPipeFileWrap(self.commands[-1].stdout)
+        stdout = commands[-1].stdout
+        if stdout is not None:
+            self.stdout = pipebuf.NonBlockBufferedReader(stdout.fileno())
+        else:
+            self.stdout = None
 
     def finish(self):
         for command in self.commands:
@@ -152,9 +157,6 @@ class PipelineCommand(object):
 
         if self.stdout is not None:
             self.stdout.close()
-
-        assert self.stdin is None or self.stdin.closed
-        assert self.stdout is None or self.stdout.closed
 
         if retcode != 0:
             raise UserCritical(
