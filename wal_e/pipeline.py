@@ -60,6 +60,11 @@ class Pipeline(object):
         # Connect all interior commands to one another via stdin/stdout
         for command in commands[1:]:
             last_command.start()
+
+            # Set large kernel buffering between pipeline
+            # participants.
+            pipebuf.set_maximum(last_command.stdout.fileno())
+
             command.stdinSet = last_command.stdout
             last_command = command
 

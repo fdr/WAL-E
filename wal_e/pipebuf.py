@@ -50,16 +50,19 @@ except:
     pass
 
 
+def set_maximum(fd):
+    # If it is possible to tweak the kernel buffer size, do so.
+    if OS_PIPE_SZ and hasattr(fcntl, 'F_SETPIPE_SZ'):
+        fcntl.fcntl(fd, fcntl.F_SETPIPE_SZ, OS_PIPE_SZ)
+
+
 def _setup_fd(fd):
     """Common set-up code for initializing a (pipe) file descriptor"""
 
     # Make the file nonblocking (but don't lose its previous flags)
     flags = fcntl.fcntl(fd, fcntl.F_GETFL)
     fcntl.fcntl(fd, fcntl.F_SETFL, flags | os.O_NONBLOCK)
-
-    # If it is possible to tweak the kernel buffer size, do so.
-    if OS_PIPE_SZ and hasattr(fcntl, 'F_SETPIPE_SZ'):
-        fcntl.fcntl(fd, fcntl.F_SETPIPE_SZ, OS_PIPE_SZ)
+    set_maximum(fd)
 
 
 class ByteDeque(object):
