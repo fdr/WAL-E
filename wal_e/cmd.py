@@ -22,8 +22,36 @@ gevent_monkey()
 #
 # Only Python 2.7+ possesses the 'ciphers' keyword to wrap_socket.
 if sys.version_info >= (2, 7):
+    def getresponse_monkey():
+        import httplib
+        original = httplib.HTTPConnection.getresponse
+
+        def monkey(*args, **kwargs):
+            kwargs['buffering'] = True
+            return original(*args, **kwargs)
+
+        httplib.HTTPConnection.getresponse = monkey
+
+    getresponse_monkey()
+
     def ssl_monkey():
         import ssl
+        import socket
+
+        rcv_buf_sz = None
+        snd_buf_sz = None
+
+        try:
+            with open('/proc/sys/net/core/rmem_max', 'r') as f:
+                rcv_buf_sz = int(f.read())
+        except:
+            pass
+
+        try:
+            with open('/proc/sys/net/core/wmem_max', 'r') as f:
+                snd_buf_sz = int(f.read())
+        except:
+            pass
 
         original = ssl.wrap_socket
 
@@ -60,6 +88,15 @@ if sys.version_info >= (2, 7):
             #   none, so disable it until someone produces material
             #   complaint.
             kwargs['ciphers'] = 'HIGH:!aNULL:!SSLv2:!RC4:!3DES:!MD5'
+
+            sock = args[0]
+
+            if rcv_buf_sz:
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, rcv_buf_sz)
+
+            if snd_buf_sz:
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, snd_buf_sz)
+
             return original(*args, **kwargs)
 
         ssl.wrap_socket = wrap_socket_monkey
