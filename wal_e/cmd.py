@@ -485,6 +485,12 @@ def main():
         backup_cxt = configure_backup_cxt(args)
 
         if subcommand == 'backup-fetch':
+            # Monkey-patch copyfileobj to exploit larger buffers.
+            import tarfile
+            from wal_e import copyfileobj
+
+            tarfile.copyfileobj = copyfileobj.copyfileobj
+
             external_program_check([LZOP_BIN])
             backup_cxt.database_fetch(
                 args.PG_CLUSTER_DIRECTORY,
