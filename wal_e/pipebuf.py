@@ -71,6 +71,9 @@ class ByteDeque(object):
         self._dq = collections.deque()
         self.byteSz = 0
 
+        self.hit = 0
+        self.miss = 0
+
     def add(self, b):
         self._dq.append(b)
         self.byteSz += len(b)
@@ -79,9 +82,9 @@ class ByteDeque(object):
         assert n <= self.byteSz, 'caller responsibility to ensure enough bytes'
 
         if n == self.byteSz and len(self._dq) == 1:
-            print 'hit'
+            self.hit += 1
         else:
-            print 'miss'
+            self.miss += 1
 
         out = bytearray(n)
         remaining = n
@@ -137,8 +140,6 @@ class NonBlockBufferedReader(object):
         self.got_eof = (chunk == '')
 
     def read(self, size=None):
-        print 'asdf', size
-
         # Handle case of "read all".
         if size is None:
 
@@ -166,6 +167,7 @@ class NonBlockBufferedReader(object):
             assert False
 
     def close(self):
+        print 'hit', self._bd.hit, ':', 'miss', self._bd.miss
         os.close(self._fd)
 
         self._fd = -1
