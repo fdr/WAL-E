@@ -132,6 +132,8 @@ class NonBlockBufferedReader(object):
         self.got_eof = (chunk == '')
 
     def read(self, size=None):
+        print 'asdf', size
+
         # Handle case of "read all".
         if size is None:
 
