@@ -86,6 +86,8 @@ class ByteDeque(object):
         else:
             self.miss += 1
 
+        print 'wat', self.hit, self.miss
+
         out = bytearray(n)
         remaining = n
         while remaining > 0:
