@@ -6,6 +6,24 @@ and fetching of WAL segments and base backups of the PostgreSQL data directory.
 """
 import sys
 
+import traceback, signal
+
+def debug(sig, frame):
+    # Adapted from
+    # "showing-the-stack-trace-from-a-running-python-application".
+    d = {'_frame': frame}
+    d.update(frame.f_globals)
+    d.update(frame.f_locals)
+
+    message = "SIGUSR1 recieved: .\nTraceback:\n"
+    message += ''.join(traceback.format_stack(frame))
+    print message
+
+
+def listen():
+    signal.signal(signal.SIGUSR1, debug)  # Register handler
+
+listen()
 
 def gevent_monkey(*args, **kwargs):
     import gevent.monkey
