@@ -78,6 +78,11 @@ class ByteDeque(object):
     def get(self, n):
         assert n <= self.byteSz, 'caller responsibility to ensure enough bytes'
 
+        if n == self.byteSz and len(self._dq) == 1:
+            print 'hit'
+        else:
+            print 'miss'
+
         out = bytearray(n)
         remaining = n
         while remaining > 0:
