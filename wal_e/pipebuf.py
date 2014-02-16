@@ -82,11 +82,8 @@ class ByteDeque(object):
         assert n <= self.byteSz, 'caller responsibility to ensure enough bytes'
 
         if n == self.byteSz and len(self._dq) == 1:
-            self.hit += 1
-        else:
-            self.miss += 1
-
-        print 'wat', self.hit, self.miss
+            self.byteSz = 0
+            return self._dq.popleft()
 
         out = bytearray(n)
         remaining = n
