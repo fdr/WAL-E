@@ -91,15 +91,16 @@ class ByteDeque(object):
             part = self._dq.popleft()
             delta = remaining - len(part)
             offset = n - remaining
+            plen = len(part)
 
             if delta == 0:
-                out[offset:] = part
+                out[offset:offset + plen] = part
                 remaining = 0
             elif delta > 0:
-                out[offset:] = part
+                out[offset:offset + plen] = part
                 remaining = delta
             elif delta < 0:
-                cleave = len(part) + delta
+                cleave = plen + delta
                 out[offset:offset + cleave] = buffer(part, 0, cleave)
                 self._dq.appendleft(buffer(part, cleave))
                 remaining = 0
