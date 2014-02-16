@@ -2,6 +2,7 @@ import shutil
 
 from wal_e import pipebuf
 
+
 def copyfileobj(src, dst, length=None):
     """Copy length bytes from fileobj src to fileobj dst.
        If length is None, copy the entire content.
