@@ -100,7 +100,7 @@ class ByteDeque(object):
                 remaining = delta
             elif delta < 0:
                 cleave = len(part) + delta
-                out[offset:] = buffer(part, 0, cleave)
+                out[offset:offset + cleave] = buffer(part, 0, cleave)
                 self._dq.appendleft(buffer(part, cleave))
                 remaining = 0
             else:
