@@ -201,9 +201,8 @@ class NonBlockBufferedWriter(object):
     def write(self, data):
         self._bd.add(data)
 
-        flush_until_less_than = PIPE_BUF_BYTES + 1
         while self._bd.byteSz > PIPE_BUF_BYTES:
-            self._partial_flush(flush_until_less_than)
+            self._partial_flush(65 * 1024)
 
     def flush(self):
         while self._bd.byteSz > 0:
