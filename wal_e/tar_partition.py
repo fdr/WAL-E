@@ -47,6 +47,7 @@ import tarfile
 
 import wal_e.log_help as log_help
 
+from wal_e import pipebuf
 from wal_e.exception import UserException
 
 logger = log_help.WalELogger(__name__)
@@ -214,7 +215,8 @@ class TarPartition(list):
         # Though this method doesn't fit cleanly into the TarPartition object,
         # tarballs are only ever extracted for partitions so the logic jives
         # for the most part.
-        tar = tarfile.open(mode='r|', fileobj=fileobj)
+        tar = tarfile.open(mode='r|', fileobj=fileobj,
+                           bufsize=pipebuf.PIPE_BUF_BYTES)
 
         # canonicalize dest_path so the prefix check below works
         dest_path = os.path.realpath(dest_path)
@@ -251,7 +253,8 @@ class TarPartition(list):
     def tarfile_write(self, fileobj):
         tar = None
         try:
-            tar = tarfile.open(fileobj=fileobj, mode='w|')
+            tar = tarfile.open(fileobj=fileobj, mode='w|',
+                               bufsize=pipebuf.PIPE_BUF_BYTES)
 
             for et_info in self:
                 # Treat files specially because they may grow, shrink,
