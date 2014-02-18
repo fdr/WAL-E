@@ -82,6 +82,10 @@ class Pipeline(object):
             self.stdout = None
 
     def finish(self):
+        if self.stdin is not None:
+            self.stdin.flush()
+            self.stdin.close()
+
         for command in self.commands:
             command.finish()
 
