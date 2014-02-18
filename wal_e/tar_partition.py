@@ -47,6 +47,7 @@ import tarfile
 
 import wal_e.log_help as log_help
 
+from wal_e import pipebuf
 from wal_e.exception import UserException
 
 logger = log_help.WalELogger(__name__)
@@ -251,7 +252,8 @@ class TarPartition(list):
     def tarfile_write(self, fileobj):
         tar = None
         try:
-            tar = tarfile.open(fileobj=fileobj, mode='w|', bufsize=0)
+            tar = tarfile.open(fileobj=fileobj, mode='w|',
+                               bufsize=pipebuf.PIPE_BUF_BYTES)
 
             for et_info in self:
                 # Treat files specially because they may grow, shrink,
