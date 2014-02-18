@@ -78,7 +78,8 @@ class ByteDeque(object):
     def get(self, n):
         assert n <= self.byteSz, 'caller responsibility to ensure enough bytes'
 
-        if n == self.byteSz and len(self._dq) == 1:
+        if (n == self.byteSz and len(self._dq) == 1 and
+            isinstance(self._dq[0], bytes)):
             self.byteSz = 0
             return self._dq.popleft()
 
