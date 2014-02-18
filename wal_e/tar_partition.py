@@ -47,7 +47,9 @@ import tarfile
 
 import wal_e.log_help as log_help
 
+from wal_e import copyfileobj
 from wal_e import pipebuf
+from wal_e import pipeline
 from wal_e.exception import UserException
 
 logger = log_help.WalELogger(__name__)
@@ -229,7 +231,14 @@ class TarPartition(list):
         for member in tar:
             assert not member.name.startswith('/')
 
-            tar.extract(member, path=dest_path)
+            if member.isreg() and member.size >= pipebuf.PIPE_BUF_BYTES:
+                pl = pipeline.Pipeline([pipeline.CatFilter()],
+                                       pipeline.PIPE, dest_path)
+                fp = tar.extractfile(member)
+                copyfileobj.copyfileobj(fp, pl.stdin)
+                pl.finish()
+            else:
+                tar.extract(member, path=dest_path)
 
             if member.issym():
                 # It does not appear possible to fsync a symlink, or
