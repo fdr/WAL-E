@@ -187,7 +187,7 @@ class CatFilter(PipelineCommand):
 
     """
     def __init__(self, stdin=PIPE, stdout=PIPE):
-        PipelineCommand.__init__(self, [CAT_BIN], stdin, stdout)
+        PipelineCommand.__init__(self, ['tee', '-'], stdin, stdout)
 
 
 class LZOCompressionFilter(PipelineCommand):
