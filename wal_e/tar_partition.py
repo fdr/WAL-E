@@ -231,13 +231,15 @@ class TarPartition(list):
         # getmembers() method will consume it before we extract any data.
         for member in tar:
             assert not member.name.startswith('/')
+            relpath = os.path.join(dest_path, member.name)
 
             if member.isreg() and member.size >= pipebuf.PIPE_BUF_BYTES:
-                pl = pipeline.Pipeline([pipeline.CatFilter()],
-                                       pipeline.PIPE, dest_path)
-                fp = tar.extractfile(member)
-                copyfileobj.copyfileobj(fp, pl.stdin)
-                pl.finish()
+                with open(relpath, 'w') as dest:
+                    pl = pipeline.Pipeline([pipeline.CatFilter()],
+                                           pipeline.PIPE, dest)
+                    fp = tar.extractfile(member)
+                    copyfileobj.copyfileobj(fp, pl.stdin)
+                    pl.finish()
             else:
                 tar.extract(member, path=dest_path)
 
@@ -247,7 +249,6 @@ class TarPartition(list):
                 # one to get a fd to run fsync on.
                 pass
             else:
-                relpath = os.path.join(dest_path, member.name)
                 filename = os.path.realpath(relpath)
                 extracted_files.append(filename)
 
