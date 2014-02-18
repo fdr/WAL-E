@@ -11,6 +11,7 @@ from wal_e.piper import popen_sp, PIPE
 PV_BIN = 'pv'
 GPG_BIN = 'gpg'
 LZOP_BIN = 'lzop'
+CAT_BIN = 'cat'
 
 
 def get_upload_pipeline(in_fd, out_fd, rate_limit=None,
@@ -20,6 +21,7 @@ def get_upload_pipeline(in_fd, out_fd, rate_limit=None,
     commands = []
     if rate_limit is not None:
         commands.append(PipeViewerRateLimitFilter(rate_limit))
+        commands.append(CatFilter())
     commands.append(LZOCompressionFilter())
 
     if gpg_key is not None:
@@ -169,6 +171,19 @@ class PipeViewerRateLimitFilter(PipelineCommand):
         PipelineCommand.__init__(
             self,
             [PV_BIN, '--rate-limit=' + unicode(rate_limit)], stdin, stdout)
+
+
+class CatFilter(PipelineCommand):
+    """Run bytes through 'cat'
+
+    'pv' sets its output file descriptor as non-blocking, and lzop
+    enters a tight loop when receiving EAGAIN.  Use an intermediate
+    'cat' as a workaround to convert the non-blocking pipe into a
+    blocking one.
+
+    """
+    def __init__(self, stdin=PIPE, stdout=PIPE):
+        PipelineCommand.__init__(self, [CAT_BIN], stdin, stdout)
 
 
 class LZOCompressionFilter(PipelineCommand):
