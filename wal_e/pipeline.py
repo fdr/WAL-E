@@ -21,7 +21,6 @@ def get_upload_pipeline(in_fd, out_fd, rate_limit=None,
     commands = []
     if rate_limit is not None:
         commands.append(PipeViewerRateLimitFilter(rate_limit))
-        commands.append(CatFilter())
     commands.append(LZOCompressionFilter())
 
     if gpg_key is not None:
@@ -187,7 +186,7 @@ class CatFilter(PipelineCommand):
 
     """
     def __init__(self, stdin=PIPE, stdout=PIPE):
-        PipelineCommand.__init__(self, ['tee', '-'], stdin, stdout)
+        PipelineCommand.__init__(self, [CAT_BIN], stdin, stdout)
 
 
 class LZOCompressionFilter(PipelineCommand):
