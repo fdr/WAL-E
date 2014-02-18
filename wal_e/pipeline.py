@@ -70,13 +70,13 @@ class Pipeline(object):
 
         stdin = commands[0].stdin
         if stdin is not None:
-            self.stdin = pipebuf.NonBlockBufferedWriter(stdin.fileno())
+            self.stdin = pipebuf.NonBlockBufferedWriter(stdin)
         else:
             self.stdin = None
 
         stdout = commands[-1].stdout
         if stdout is not None:
-            self.stdout = pipebuf.NonBlockBufferedReader(stdout.fileno())
+            self.stdout = pipebuf.NonBlockBufferedReader(stdout)
         else:
             self.stdout = None
 

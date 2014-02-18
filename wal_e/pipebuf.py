@@ -116,11 +116,13 @@ class ByteDeque(object):
 class NonBlockBufferedReader(object):
     """A buffered pipe reader that adheres to the Python file protocol"""
 
-    def __init__(self, fd):
-        _setup_fd(fd)
-        self._fd = fd
+    def __init__(self, fp):
+        self._fp = fp
+        self._fd = fp.fileno()
         self._bd = ByteDeque()
         self.got_eof = False
+
+        _setup_fd(self._fd)
 
     def _read_chunk(self, sz):
         chunk = None
@@ -169,10 +171,9 @@ class NonBlockBufferedReader(object):
             assert False
 
     def close(self):
-        os.close(self._fd)
-
         self._fd = -1
         del self._bd
+        self._fp.close()
 
     def fileno(self):
         return self._fd
@@ -185,10 +186,12 @@ class NonBlockBufferedReader(object):
 class NonBlockBufferedWriter(object):
     """A buffered pipe writer that adheres to the Python file protocol"""
 
-    def __init__(self, fd):
-        _setup_fd(fd)
-        self._fd = fd
+    def __init__(self, fp):
+        self._fp = fp
+        self._fd = fp.fileno()
         self._bd = ByteDeque()
+
+        _setup_fd(self._fd)
 
     def _partial_flush(self, max_retain):
         byts = self._bd.get_all()
@@ -222,10 +225,10 @@ class NonBlockBufferedWriter(object):
         return self._fd
 
     def close(self):
-        os.close(self._fd)
-
         self._fd = -1
         del self._bd
+        self._fp.close()
+
 
     @property
     def closed(self):

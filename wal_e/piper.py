@@ -112,13 +112,13 @@ def popen_nonblock(*args, **kwargs):
     proc = popen_sp(*args, **kwargs)
 
     if proc.stdin:
-        proc.stdin = pipebuf.NonBlockBufferedWriter(proc.stdin.fileno())
+        proc.stdin = pipebuf.NonBlockBufferedWriter(proc.stdin)
 
     if proc.stdout:
-        proc.stdout = pipebuf.NonBlockBufferedReader(proc.stdout.fileno())
+        proc.stdout = pipebuf.NonBlockBufferedReader(proc.stdout)
 
     if proc.stderr:
-        proc.stderr = pipebuf.NonBlockBufferedReader(proc.stderr.fileno())
+        proc.stderr = pipebuf.NonBlockBufferedReader(proc.stderr)
 
     return proc
 
