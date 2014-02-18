@@ -217,7 +217,8 @@ class TarPartition(list):
         # Though this method doesn't fit cleanly into the TarPartition object,
         # tarballs are only ever extracted for partitions so the logic jives
         # for the most part.
-        tar = tarfile.open(mode='r|', fileobj=fileobj, bufsize=1)
+        tar = tarfile.open(mode='r|', fileobj=fileobj,
+                           bufsize=pipebuf.PIPE_BUF_BYTES)
 
         # canonicalize dest_path so the prefix check below works
         dest_path = os.path.realpath(dest_path)
