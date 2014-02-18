@@ -240,6 +240,9 @@ class TarPartition(list):
                     fp = tar.extractfile(member)
                     copyfileobj.copyfileobj(fp, pl.stdin)
                     pl.finish()
+                tar.chown(member, relpath)
+                tar.chmod(member, relpath)
+                tar.utime(member, relpath)
             else:
                 tar.extract(member, path=dest_path)
 
