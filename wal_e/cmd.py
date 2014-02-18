@@ -497,7 +497,7 @@ def configure_backup_cxt(args):
             hint='Report a bug.')
 
 
-def monkeypatch_tarfile_copyfileobj()
+def monkeypatch_tarfile_copyfileobj():
     """Monkey-patch tarfile.copyfileobj to exploit large buffers"""
     import tarfile
     from wal_e import copyfileobj
