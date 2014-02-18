@@ -125,10 +125,10 @@ class NonBlockBufferedReader(object):
         self._bd = ByteDeque()
         self.got_eof = False
 
-    def _read_chunk(self):
+    def _read_chunk(self, sz):
         chunk = None
         try:
-            chunk = os.read(self._fd, PIPE_BUF_BYTES)
+            chunk = os.read(self._fd, sz)
             self._bd.add(chunk)
         except EnvironmentError, e:
             if e.errno in [errno.EAGAIN, errno.EWOULDBLOCK]:
@@ -145,7 +145,7 @@ class NonBlockBufferedReader(object):
 
             # Read everything.
             while not self.got_eof:
-                self._read_chunk()
+                self._read_chunk(PIPE_BUF_BYTES)
 
             # Defragment and return the contents.
             return self._bd.get_all()
@@ -162,7 +162,12 @@ class NonBlockBufferedReader(object):
                     # Not enough bytes buffered and stream is still
                     # open: read more bytes.
                     assert not self.got_eof
-                    self._read_chunk()
+
+                    if size == PIPE_BUF_BYTES:
+                        to_read = PIPE_BUF_BYTES - self._bd.byteSz
+                        self._read_chunk(to_read)
+                    else:
+                        self._read_chunk(PIPE_BUF_BYTES)
         else:
             assert False
 
