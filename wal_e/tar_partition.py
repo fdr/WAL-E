@@ -214,7 +214,7 @@ class TarPartition(list):
         # Though this method doesn't fit cleanly into the TarPartition object,
         # tarballs are only ever extracted for partitions so the logic jives
         # for the most part.
-        tar = tarfile.open(mode='r|', fileobj=fileobj)
+        tar = tarfile.open(mode='r|', fileobj=fileobj, bufsize=0)
 
         # canonicalize dest_path so the prefix check below works
         dest_path = os.path.realpath(dest_path)
@@ -251,7 +251,7 @@ class TarPartition(list):
     def tarfile_write(self, fileobj):
         tar = None
         try:
-            tar = tarfile.open(fileobj=fileobj, mode='w|')
+            tar = tarfile.open(fileobj=fileobj, mode='w|', bufsize=0)
 
             for et_info in self:
                 # Treat files specially because they may grow, shrink,
