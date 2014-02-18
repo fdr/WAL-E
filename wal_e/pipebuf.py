@@ -229,7 +229,6 @@ class NonBlockBufferedWriter(object):
         del self._bd
         self._fp.close()
 
-
     @property
     def closed(self):
         return self._fd == -1
