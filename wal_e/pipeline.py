@@ -12,13 +12,6 @@ PV_BIN = 'pv'
 GPG_BIN = 'gpg'
 LZOP_BIN = 'lzop'
 
-# BUFSIZE_HT: Buffer Size, High Throughput
-#
-# This is set conservatively because small systems can end up being
-# unhappy with too much memory usage in buffers.
-
-BUFSIZE_HT = 128 * 8192
-
 
 def get_upload_pipeline(in_fd, out_fd, rate_limit=None,
                         gpg_key=None):
@@ -114,7 +107,7 @@ class PipelineCommand(object):
 
         self._process = popen_sp(self._command,
                                  stdin=self._stdin, stdout=self._stdout,
-                                 bufsize=BUFSIZE_HT, close_fds=True)
+                                 close_fds=True)
 
     @property
     def stdin(self):
