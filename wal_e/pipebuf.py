@@ -195,6 +195,8 @@ class NonBlockBufferedWriter(object):
         self._bd = ByteDeque()
 
     def _partial_flush(self, max_retain):
+        print 'sizevector', [len(x) for x in self._bd._dq]
+
         byts = self._bd.get_all()
         cursor = buffer(byts)
 
