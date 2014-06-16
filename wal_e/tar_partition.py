@@ -272,7 +272,7 @@ class TarPartition(list):
             assert not member.name.startswith('/')
             relpath = os.path.join(dest_path, member.name)
 
-            if member.isreg() and member.size >= pipebuf.PIPE_BUF_BYTES:
+            if member.isreg() and member.size >= 0:
                 cat_extract(tar, member, relpath)
             else:
                 tar.extract(member, path=dest_path)
