@@ -1,5 +1,8 @@
-from azure.storage import BlobService
 import os
+import pytest
+
+from azure.storage import BlobService
+from wal_e.blobstore import wabs
 
 
 def no_real_wabs_credentials():
@@ -15,6 +18,31 @@ def no_real_wabs_credentials():
             return True
 
     return False
+
+
+def prepare_wabs_default_test_container():
+    # Check credentials are present: this procedure should not be
+    # called otherwise.
+    if no_real_wabs_credentials():
+        assert False
+
+    container_name = 'wal-e-test-' + os.getenv('WABS_ACCOUNT_NAME').lower()
+
+    creds = wabs.Credentials(os.getenv('WABS_ACCOUNT_NAME'),
+                             os.getenv('WABS_ACCESS_KEY'))
+    cinfo = wabs.calling_format.from_store_name(container_name)
+    conn = cinfo.connect(creds)
+
+    while conn.create_container(container_name):
+        pass
+
+    return container_name
+
+
+@pytest.fixture(scope='session')
+def default_test_wabs_container():
+    if not no_real_wabs_credentials():
+        return prepare_wabs_default_test_container()
 
 
 def apathetic_container_delete(container_name, *args, **kwargs):
