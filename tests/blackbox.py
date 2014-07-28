@@ -46,7 +46,7 @@ class AwsTestConfig(object):
 
 
 class AwsInstanceProfileTestConfig(object):
-    name = 'aws+instance-profile'
+    name = 'aws+instanceprofile'
 
     def __init__(self, request):
         self.request = request
