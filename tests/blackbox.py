@@ -17,12 +17,14 @@ class AwsTestConfig(object):
     def __init__(self, request):
         self.env_vars = {}
         self.monkeypatch = request.getfuncargvalue('monkeypatch')
+        self.test_bucket = request.getfuncargvalue('default_test_bucket')
+        self.test_name = request.node.name
 
         for name in _AWS_CRED_ENV_VARS:
             maybe_value = os.getenv(name)
             self.env_vars[name] = maybe_value
 
-    def patch(self, test_name, default_test_bucket):
+    def patch(self):
         # Scrub WAL-E prefixes left around in the user's environment to
         # prevent unexpected results.
         for name in _PREFIX_VARS:
@@ -36,7 +38,7 @@ class AwsTestConfig(object):
                 self.monkeypatch.setenv(name, value)
 
         self.monkeypatch.setenv('WALE_S3_PREFIX', 's3://{0}/{1}'
-                                .format(default_test_bucket, test_name))
+                                .format(self.test_bucket, self.test_name))
 
     def main(self, *args):
         self.monkeypatch.setattr(sys, 'argv', ['wal-e'] + list(args))
@@ -49,15 +51,17 @@ class AwsInstanceProfileTestConfig(object):
     def __init__(self, request):
         self.request = request
         self.monkeypatch = request.getfuncargvalue('monkeypatch')
+        self.test_bucket = request.getfuncargvalue('default_test_bucket')
+        self.test_name = request.node.name
 
-    def patch(self, test_name, default_test_bucket):
+    def patch(self):
         # Get STS-vended credentials to stand in for Instance Profile
         # credentials before scrubbing the environment of AWS
         # environment variables.
         c = s3_integration_help.sts_conn()
-        policy = s3_integration_help.make_policy(default_test_bucket,
-                                                 test_name)
-        fed = c.get_federation_token(default_test_bucket, policy=policy)
+        policy = s3_integration_help.make_policy(self.test_bucket,
+                                                 self.test_name)
+        fed = c.get_federation_token(self.test_bucket, policy=policy)
 
         # Scrub AWS environment-variable based cred to make sure the
         # instance profile path is used.
@@ -65,7 +69,7 @@ class AwsInstanceProfileTestConfig(object):
             self.monkeypatch.delenv(name, raising=False)
 
         self.monkeypatch.setenv('WALE_S3_PREFIX', 's3://{0}/{1}'
-                                .format(default_test_bucket, test_name))
+                                .format(self.test_bucket, self.test_name))
 
         # Patch boto.utils.get_instance_metadata to return a ginned up
         # credential.
@@ -120,9 +124,9 @@ def _make_fixture_param_and_ids():
 
 
 @pytest.fixture(**_make_fixture_param_and_ids())
-def config(request, monkeypatch, default_test_bucket):
+def config(request, monkeypatch):
     config = request.param(request)
-    config.patch(request.node.name, default_test_bucket)
+    config.patch()
     return config
 
 
