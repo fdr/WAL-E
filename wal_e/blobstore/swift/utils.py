@@ -7,6 +7,7 @@ import gevent
 from swiftclient.exceptions import ClientException
 
 from wal_e import log_help
+from wal_e import files
 from wal_e.blobstore.swift import calling_format
 from wal_e.pipeline import get_download_pipeline
 from wal_e.piper import PIPE
@@ -83,7 +84,7 @@ def do_lzop_get(creds, uri, path, decrypt, do_retry=True):
         del tb
 
     def download():
-        with open(path, 'wb') as decomp_out:
+        with files.DeleteOnError(path) as decomp_out:
             with get_download_pipeline(PIPE, decomp_out, decrypt) as pl:
 
                 conn = calling_format.connect(creds)

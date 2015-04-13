@@ -45,6 +45,7 @@ import errno
 import os
 import tarfile
 
+from wal_e import files
 from wal_e import log_help
 from wal_e import copyfileobj
 from wal_e import pipebuf
@@ -210,7 +211,7 @@ def cat_extract(tar, member, targetpath):
             else:
                 raise
 
-    with open(targetpath, 'wb') as dest:
+    with files.DeleteOnError(targetpath) as dest:
         with pipeline.get_cat_pipeline(pipeline.PIPE, dest) as pl:
             fp = tar.extractfile(member)
             copyfileobj.copyfileobj(fp, pl.stdin)
