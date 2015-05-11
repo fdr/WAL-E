@@ -212,7 +212,7 @@ def cat_extract(tar, member, targetpath):
                 raise
 
     with files.DeleteOnError(targetpath) as dest:
-        with pipeline.get_cat_pipeline(pipeline.PIPE, dest) as pl:
+        with pipeline.get_cat_pipeline(pipeline.PIPE, dest.f) as pl:
             fp = tar.extractfile(member)
             copyfileobj.copyfileobj(fp, pl.stdin)
 

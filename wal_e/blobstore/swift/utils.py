@@ -85,7 +85,7 @@ def do_lzop_get(creds, uri, path, decrypt, do_retry=True):
 
     def download():
         with files.DeleteOnError(path) as decomp_out:
-            with get_download_pipeline(PIPE, decomp_out, decrypt) as pl:
+            with get_download_pipeline(PIPE, decomp_out.f, decrypt) as pl:
 
                 conn = calling_format.connect(creds)
 
@@ -109,6 +109,7 @@ def do_lzop_get(creds, uri, path, decrypt, do_retry=True):
                             hint=('This can be normal when Postgres is trying '
                                   'to detect what timelines are available '
                                   'during restoration.'))
+                        decomp_out.remove_regardless = True
                         return False
                     else:
                         raise
