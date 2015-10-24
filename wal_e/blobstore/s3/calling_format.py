@@ -93,7 +93,13 @@ def _connect_secureish(*args, **kwargs):
 
     kwargs['is_secure'] = True
 
-    return connection.S3Connection(*args, **kwargs)
+    auth_region_name = kwargs.pop('auth_region_name', None)
+    conn = connection.S3Connection(*args, **kwargs)
+
+    if auth_region_name:
+        conn.auth_region_name = auth_region_name
+
+    return conn
 
 
 def _s3connection_opts_from_uri(impl):
@@ -192,6 +198,7 @@ class CallingInfo(object):
                 *args,
                 provider=creds,
                 calling_format=self.calling_format(),
+                auth_region_name=os.getenv('AWS_REGION'),
                 **kwargs)
 
         # If WALE_S3_ENDPOINT is set, do not attempt to guess
@@ -204,7 +211,7 @@ class CallingInfo(object):
         # Check if subdomain format compatible; no need to go through
         # any region detection mumbo-jumbo of any kind.
         if self.calling_format is connection.SubdomainCallingFormat:
-            return _conn_help()
+            return _conn_help(host='s3.amazonaws.com')
 
         # Check if OrdinaryCallingFormat compatible, but also see if
         # the endpoint has already been set, in which case only

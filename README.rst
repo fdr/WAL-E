@@ -53,6 +53,7 @@ AWS S3 and Work-alikes
 * WALE_S3_PREFIX (e.g. ``s3://bucket/path/optionallymorepath``)
 * AWS_ACCESS_KEY_ID
 * AWS_SECRET_ACCESS_KEY
+* AWS_REGION (e.g. ``us-east-1``)
 
 Optional:
 
