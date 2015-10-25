@@ -42,8 +42,7 @@ def test_404_termination(tmpdir):
 
 @pytest.mark.skipif("no_real_s3_credentials()")
 def test_sigv4_only_region(tmpdir, monkeypatch):
-    # Start addressing "us-east-1" to issue CreateBucket calls.
-    monkeypatch.setenv('AWS_REGION', 'us-east-1')
+    monkeypatch.setenv('AWS_REGION', 'eu-central-1')
     sigv4_check_apply()
 
     bucket_name = bucket_name_mangle('sigv4')
@@ -57,10 +56,6 @@ def test_sigv4_only_region(tmpdir, monkeypatch):
     except boto.exception.S3CreateError:
         pass
 
-    # Switch to eu-central-1, as the Subdomain Calling Format will
-    # take care of directing the bucket (even with the suffix
-    # ".s3.amazonaws.com") to the right region.
-    monkeypatch.setenv('AWS_REGION', 'eu-central-1')
     source = unicode(tmpdir.join('source'))
     contents = 'abcdefghijklmnopqrstuvwxyz\n' * 100
     with open(source, 'wb') as f:
