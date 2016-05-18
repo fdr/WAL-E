@@ -562,7 +562,7 @@ def main():
     if subcommand == 'version':
         import pkgutil
 
-        print(pkgutil.get_data('wal_e', 'VERSION').strip())
+        print(pkgutil.get_data('wal_e', 'VERSION').decode('ascii').strip())
         sys.exit(0)
 
     # Print a start-up message right away.

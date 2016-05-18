@@ -5,7 +5,7 @@ from wal_e import pipebuf
 
 
 def create_bogus_payload(dirname):
-    payload = 'abcd' * 1048576
+    payload = b'abcd' * 1048576
     payload_file = dirname.join('payload')
     payload_file.write(payload)
     return payload, payload_file
