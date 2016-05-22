@@ -77,7 +77,7 @@ def test_policy(sts_conn, monkeypatch):
 
         # Test the GET privilege.
         for key in prefix_fetched_keys:
-            assert key.get_contents_as_string() == 'wal-e test'
+            assert key.get_contents_as_string() == b'wal-e test'
 
         # Try a bogus listing outside the valid prefix.
         with pytest.raises(exception.S3ResponseError) as e:
