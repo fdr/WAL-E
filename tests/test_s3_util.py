@@ -57,7 +57,7 @@ def test_sigv4_only_region(tmpdir, monkeypatch):
         pass
 
     source = str(tmpdir.join('source'))
-    contents = 'abcdefghijklmnopqrstuvwxyz\n' * 100
+    contents = b'abcdefghijklmnopqrstuvwxyz\n' * 100
     with open(source, 'wb') as f:
         f.write(contents)
 
