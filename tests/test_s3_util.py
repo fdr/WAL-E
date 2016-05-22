@@ -45,24 +45,24 @@ def test_sigv4_only_region(tmpdir, monkeypatch):
     bucket_name = bucket_name_mangle('sigv4')
     creds = Credentials(os.getenv('AWS_ACCESS_KEY_ID'),
                         os.getenv('AWS_SECRET_ACCESS_KEY'))
+    monkeypatch.setenv('AWS_REGION', 'eu-central-1')
 
     def create_bucket_if_not_exists():
-        """Create a bucket in eu-central-1 if it does not exist
+        """Create a bucket via path-based API calls.
 
-        This is done via us-east-1's endpoint because in the case a
-        bucket has not been created yet, one cannot use a subdomain
-        calling format to do API calls: the domain for the bucket does
-        not yet exist.
+        This is because the preferred "$BUCKETNAME.s3.amazonaws"
+        subdomain doesn't yet exist for a non-existent bucket.
 
         """
-        monkeypatch.setenv('AWS_REGION', 'us-east-1')
+        monkeypatch.setenv('WALE_S3_ENDPOINT',
+                           'https+path://s3-eu-central-1.amazonaws.com')
         cinfo = calling_format.from_store_name(bucket_name)
         conn = cinfo.connect(creds)
         try:
             conn.create_bucket(bucket_name, location='eu-central-1')
         except boto.exception.S3CreateError:
             pass
-        monkeypatch.delenv('AWS_REGION')
+        monkeypatch.delenv('WALE_S3_ENDPOINT')
 
     create_bucket_if_not_exists()
 
@@ -72,7 +72,7 @@ def test_sigv4_only_region(tmpdir, monkeypatch):
         This is done using the subdomain that points to eu-central-1.
 
         """
-        monkeypatch.setenv('AWS_REGION', 'eu-central-1')
+
         sigv4_check_apply()
         cinfo = calling_format.from_store_name(bucket_name)
         conn = cinfo.connect(creds)
