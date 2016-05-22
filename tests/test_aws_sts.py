@@ -117,7 +117,7 @@ def test_uri_put_file(sts_conn, monkeypatch):
                      StringIO('test-content'))
         k = connection.Key(fb.conn.get_bucket(bn, validate=False))
         k.name = key_path
-        assert k.get_contents_as_string() == 'test-content'
+        assert k.get_contents_as_string() == b'test-content'
 
 
 @pytest.mark.skipif("no_real_s3_credentials()")
