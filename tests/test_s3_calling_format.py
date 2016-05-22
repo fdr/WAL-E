@@ -193,8 +193,8 @@ def test_cipher_suites():
     if 'port' in spec.args:
         kw['port'] = 443
 
-    htcon = conn._pool.get_http_connection(**kw)
-
+    htcon = conn.new_http_connection(**kw)
+    htcon.connect()
     chosen_cipher_suite = htcon.sock.cipher()[0].split('-')
 
     # Test for the expected cipher suite.
