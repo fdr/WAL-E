@@ -154,7 +154,7 @@ def test_str_repr_call_info(monkeypatch):
     assert repr(cinfo) == (
         "CallingInfo(hello.world, "
         "<class 'boto.s3.connection.OrdinaryCallingFormat'>, "
-        "'us-east-1', u's3.amazonaws.com')"
+        "'us-east-1', 's3.amazonaws.com')"
     )
 
     cinfo = calling_format.from_store_name('Hello-World')
@@ -162,7 +162,7 @@ def test_str_repr_call_info(monkeypatch):
     assert repr(cinfo) == (
         "CallingInfo(Hello-World, "
         "<class 'boto.s3.connection.OrdinaryCallingFormat'>, "
-        "'us-east-1', u's3.amazonaws.com')"
+        "'us-east-1', 's3.amazonaws.com')"
     )
 
 

@@ -233,7 +233,7 @@ class NonBlockBufferedWriter(object):
             try:
                 n = os.write(self._fd, cursor)
                 flushed = True
-                cursor = memoryview(cursor, n)
+                cursor = memoryview(cursor)[n:]
             except EnvironmentError as e:
                 if e.errno in [errno.EAGAIN, errno.EWOULDBLOCK]:
                     gevent.socket.wait_write(self._fd)
