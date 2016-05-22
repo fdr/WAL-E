@@ -23,18 +23,6 @@ gevent_monkey()
 #
 # Only Python 2.7+ possesses the 'ciphers' keyword to wrap_socket.
 if sys.version_info >= (2, 7):
-    def getresponse_monkey():
-        import http.client
-        original = http.client.HTTPConnection.getresponse
-
-        def monkey(*args, **kwargs):
-            kwargs['buffering'] = True
-            return original(*args, **kwargs)
-
-        http.client.HTTPConnection.getresponse = monkey
-
-    getresponse_monkey()
-
     def ssl_monkey():
         import ssl
 
