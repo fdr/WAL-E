@@ -88,7 +88,7 @@ class StreamPadFileObj(object):
         ret = self.underlying_fp.read(max_readable)
         lenret = len(ret)
         self.pos += lenret
-        return ret + '\0' * (max_readable - lenret)
+        return ret + b'\0' * (max_readable - lenret)
 
     def close(self):
         return self.underlying_fp.close()
