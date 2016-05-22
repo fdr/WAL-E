@@ -137,7 +137,7 @@ class NonBlockBufferedReader(object):
             else:
                 raise
 
-        self.got_eof = (chunk == '')
+        self.got_eof = (chunk == b'')
 
     def read(self, size=None):
         # Handle case of "read all".
