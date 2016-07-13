@@ -216,7 +216,7 @@ def cat_extract(tar, member, targetpath):
             fp = tar.extractfile(member)
             copyfileobj.copyfileobj(fp, pl.stdin)
 
-    tar.chown(member, targetpath)
+    tar.chown(member, targetpath, False)
     tar.chmod(member, targetpath)
     tar.utime(member, targetpath)
 
