@@ -8,6 +8,7 @@ from gs_integration_help import default_test_gs_bucket
 from os import path
 from s3_integration_help import default_test_bucket
 from stage_pgxlog import pg_xlog
+from wabs_integration_help import default_test_wabs_container
 
 # Quiet pyflakes about pytest fixtures.
 assert config

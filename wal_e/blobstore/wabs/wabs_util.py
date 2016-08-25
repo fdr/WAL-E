@@ -107,6 +107,10 @@ def uri_put_file(creds, uri, fp, content_encoding=None):
     p = gevent.pool.Pool(size=pool_size)
     while True:
         data = fp.read(WABS_CHUNK_SIZE)
+        if not isinstance(data, bytes):
+            print('ASDF')
+            traceback.print_stack()
+
         if data:
             length += len(data)
             block_id = base64.b64encode(

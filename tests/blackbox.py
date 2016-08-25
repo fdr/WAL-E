@@ -3,6 +3,7 @@ import os
 import pytest
 import s3_integration_help
 import sys
+import wabs_integration_help
 
 from wal_e import cmd
 
@@ -11,6 +12,7 @@ _PREFIX_VARS = ['WALE_S3_PREFIX', 'WALE_WABS_PREFIX', 'WALE_SWIFT_PREFIX']
 _AWS_CRED_ENV_VARS = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY',
                       'AWS_SECURITY_TOKEN', 'AWS_REGION']
 _GS_CRED_ENV_VARS = ['GOOGLE_APPLICATION_CREDENTIALS']
+_WABS_CRED_ENV_VARS = ['WABS_ACCESS_KEY', 'WABS_ACCOUNT_NAME']
 
 
 class AwsTestConfig(object):
@@ -153,6 +155,39 @@ class GsTestConfig(object):
         return cmd.main()
 
 
+class WABSTestConfig(object):
+    name = 'wabs'
+
+    def __init__(self, request):
+        self.env_vars = {}
+        self.monkeypatch = request.getfuncargvalue('monkeypatch')
+        self.bucket = request.getfuncargvalue('default_test_wabs_container')
+
+        for name in _WABS_CRED_ENV_VARS:
+            maybe_value = os.getenv(name)
+            self.env_vars[name] = maybe_value
+
+    def patch(self, test_name):
+        # Scrub WAL-E prefixes left around in the user's environment to
+        # prevent unexpected results.
+        for name in _PREFIX_VARS:
+            self.monkeypatch.delenv(name, raising=False)
+
+        # Set other credentials.
+        for name, value in self.env_vars.items():
+            if value is None:
+                self.monkeypatch.delenv(name, raising=False)
+            else:
+                self.monkeypatch.setenv(name, value)
+
+        self.monkeypatch.setenv('WALE_WABS_PREFIX', 'wabs://{0}/{1}'
+                                .format(self.bucket, test_name))
+
+    def main(self, *args):
+        self.monkeypatch.setattr(sys, 'argv', ['wal-e'] + list(args))
+        return cmd.main()
+
+
 def _make_fixture_param_and_ids():
     ret = {
         'params': [],
@@ -170,6 +205,9 @@ def _make_fixture_param_and_ids():
 
     if not gs_integration_help.no_real_gs_credentials():
         _add_config(GsTestConfig)
+
+    if not wabs_integration_help.no_real_wabs_credentials():
+        _add_config(WABSTestConfig)
 
     return ret
 

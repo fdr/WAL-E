@@ -7,7 +7,14 @@ try:
 except ImportError:
     from azure.storage import BlobService
 
+import azure.common
 import os
+import pytest
+import gevent
+
+
+def container_name_mangle(cn, delimiter='-'):
+    return cn + delimiter + os.getenv('WABS_ACCOUNT_NAME').lower()
 
 
 def no_real_wabs_credentials():
@@ -23,6 +30,35 @@ def no_real_wabs_credentials():
             return True
 
     return False
+
+
+@pytest.fixture(scope='session')
+def default_test_wabs_container():
+    if not no_real_wabs_credentials():
+        return prepare_wabs_default_test_container()
+
+
+def prepare_wabs_default_test_container():
+    # Check credentials are present: this procedure should not be
+    # called otherwise.
+    if no_real_wabs_credentials():
+        assert False
+
+    bs = BlobService(os.getenv('WABS_ACCOUNT_NAME'),
+                     os.getenv('WABS_ACCESS_KEY'))
+    cn = container_name_mangle('wal-e')
+    bs.delete_container(cn)
+    bs.create_container(cn)
+
+    while True:
+        try:
+            bs.list_blobs(cn, maxresults=1)
+            break
+        except azure.common.AzureMissingResourceHttpError:
+            pass
+        gevent.sleep(1)
+
+    return cn
 
 
 def apathetic_container_delete(container_name, *args, **kwargs):
